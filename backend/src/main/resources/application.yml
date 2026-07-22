@@ -1,0 +1,18 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://db.fcrpsntztbdimuznjyos.supabase.co:5432/postgres
+    username: postgres
+    password: Adityajha123!
+  jpa:
+    hibernate:
+      ddl-auto: validate   # Flyway owns schema, not Hibernate
+    show-sql: true
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+    baseline-version: '0'
+jwt:
+  secret: ${JWT_SECRET:9a2f694578e9f1a23c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b}
+  access-token-expiry-ms: 900000      # 15 minutes
+  refresh-token-expiry-ms: 604800000  # 7 days

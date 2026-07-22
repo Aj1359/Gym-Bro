@@ -1,0 +1,25 @@
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Node / frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+frontend/.eslintcache
+frontend/coverage/
+
+# Java / backend
+backend/target/
+backend/.idea/
+backend/.vscode/
+backend/.classpath
+backend/.project
+backend/.settings/
+backend/.factorypath
+
+# Docker
+*.local
