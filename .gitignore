@@ -23,3 +23,6 @@ backend/.factorypath
 
 # Docker
 *.local
+
+# One-time scripts (contain secrets — never commit)
+scripts/

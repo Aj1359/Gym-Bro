@@ -1,7 +1,8 @@
 spring:
   datasource:
-    url: jdbc:postgresql://db.fcrpsntztbdimuznjyos.supabase.co:5432/postgres
-    username: postgres
+    # Transaction Pooler — from Supabase Dashboard → Project Settings → Database → Transaction pooler
+    url: jdbc:postgresql://aws-1-ap-south-1.pooler.supabase.com:6543/postgres?prepareThreshold=0
+    username: postgres.fcrpsntztbdimuznjyos
     password: Adityajha123!
   jpa:
     hibernate:
@@ -16,3 +17,6 @@ jwt:
   secret: ${JWT_SECRET:9a2f694578e9f1a23c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b}
   access-token-expiry-ms: 900000      # 15 minutes
   refresh-token-expiry-ms: 604800000  # 7 days
+
+supabase:
+  storage-base-url: https://fcrpsntztbdimuznjyos.supabase.co/storage/v1/object/public/exercise-images/

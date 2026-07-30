@@ -1,6 +1,8 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
+import ProfilePage from './pages/ProfilePage';
+import ExerciseLibraryPage from './pages/ExerciseLibraryPage';
 import ProtectedRoute from './routes/ProtectedRoute';
 
 function DashboardPlaceholder() {
@@ -26,6 +28,8 @@ export default function App() {
 
         <Route element={<ProtectedRoute />}>
           <Route path="/dashboard" element={<DashboardPlaceholder />} />
+          <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/exercises" element={<ExerciseLibraryPage />} />
         </Route>
 
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
