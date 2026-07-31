@@ -13,7 +13,7 @@ public class ExerciseService {
         this.exerciseRepository = exerciseRepository;
     }
 
-    public Page<Exercise> searchExercises(String muscle, String equipment, String search, Pageable pageable) {
-        return exerciseRepository.search(muscle, equipment, search, pageable);
+    public Page<Exercise> searchExercises(String muscle, String equipment, String level, String search, Pageable pageable) {
+        return exerciseRepository.search(muscle, equipment, level, search, pageable);
     }
 }

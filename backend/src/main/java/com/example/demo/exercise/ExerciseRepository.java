@@ -12,19 +12,22 @@ public interface ExerciseRepository extends JpaRepository<Exercise, UUID> {
 
     @Query(value = """
             SELECT * FROM exercises
-            WHERE (:muscle IS NULL OR :muscle = ANY(primary_muscles))
+            WHERE (:muscle IS NULL OR EXISTS (SELECT 1 FROM unnest(primary_muscles) m WHERE m ILIKE '%' || :muscle || '%'))
             AND (:equipment IS NULL OR equipment = :equipment)
+            AND (:level IS NULL OR level = :level)
             AND (:search IS NULL OR to_tsvector('english', name) @@ plainto_tsquery('english', :search))
             """,
             countQuery = """
             SELECT count(*) FROM exercises
-            WHERE (:muscle IS NULL OR :muscle = ANY(primary_muscles))
+            WHERE (:muscle IS NULL OR EXISTS (SELECT 1 FROM unnest(primary_muscles) m WHERE m ILIKE '%' || :muscle || '%'))
             AND (:equipment IS NULL OR equipment = :equipment)
+            AND (:level IS NULL OR level = :level)
             AND (:search IS NULL OR to_tsvector('english', name) @@ plainto_tsquery('english', :search))
             """,
             nativeQuery = true)
     Page<Exercise> search(@Param("muscle") String muscle,
                           @Param("equipment") String equipment,
+                          @Param("level") String level,
                           @Param("search") String search,
                           Pageable pageable);
 }

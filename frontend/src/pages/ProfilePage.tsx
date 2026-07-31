@@ -5,6 +5,7 @@ import {
   type ProfileData,
   type ProfileRequest,
 } from '../features/profile/profileApi';
+import ThemeToggle from '../components/ThemeToggle';
 
 const emptyForm: ProfileRequest = {
   age: 0,
@@ -72,6 +73,9 @@ export default function ProfilePage() {
 
   return (
     <div className="mx-auto max-w-2xl space-y-8 p-8">
+      <div className="flex justify-end p-4">
+        <ThemeToggle />
+      </div>
       {/* Profile Form */}
       <form onSubmit={handleSubmit} className="space-y-4 rounded-lg bg-white p-6 shadow">
         <h2 className="text-xl font-bold text-gray-900">Your Profile</h2>

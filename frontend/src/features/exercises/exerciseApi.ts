@@ -24,6 +24,7 @@ interface ExercisePage {
 export interface ExerciseFilters {
     muscle?: string;
     equipment?: string;
+    level?: string;
     search?: string;
     page?: number;
     size?: number;

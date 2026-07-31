@@ -20,9 +20,10 @@ public class ExerciseController {
     public ResponseEntity<Page<Exercise>> getExercises(
             @RequestParam(required = false) String muscle,
             @RequestParam(required = false) String equipment,
+            @RequestParam(required = false) String level,
             @RequestParam(required = false) String search,
             @PageableDefault(size = 20) Pageable pageable) {
 
-        return ResponseEntity.ok(exerciseService.searchExercises(muscle, equipment, search, pageable));
+        return ResponseEntity.ok(exerciseService.searchExercises(muscle, equipment, level, search, pageable));
     }
 }

@@ -1,1 +1,31 @@
 @import "tailwindcss";
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  --color-bg: #ffffff;
+  --color-surface: #f4f4f5;
+  --color-card: #ffffff;
+  --color-text: #0a0a0a;
+  --color-text-muted: #6b7280;
+  --color-border: #e5e7eb;
+  --color-accent: #65a30d;
+  --color-accent-text: #0a0a0a;
+}
+
+.dark {
+  --color-bg: #000000;
+  --color-surface: #111827;
+  --color-card: #1f2937;
+  --color-text: #f9fafb;
+  --color-text-muted: #9ca3af;
+  --color-border: #374151;
+  --color-accent: #65a30d; /* Olive green */
+  --color-accent-text: #000000;
+}
+
+body {
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
