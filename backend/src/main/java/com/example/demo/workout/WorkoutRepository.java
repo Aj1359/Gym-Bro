@@ -6,4 +6,5 @@ import java.util.UUID;
 
 public interface WorkoutRepository extends JpaRepository<Workout, UUID> {
     List<Workout> findByUserIdOrderByStartedAtDesc(UUID userId);
+    List<Workout> findByUserIdAndStartedAtBetween(UUID userId, java.time.LocalDateTime start, java.time.LocalDateTime end);
 }

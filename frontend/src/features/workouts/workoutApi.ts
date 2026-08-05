@@ -1,4 +1,5 @@
 import axiosInstance from '../../api/axiosInstance';
+import type { TemplateExercise } from '../templates/templateApi';
 
 export interface WorkoutSet {
   id: string;

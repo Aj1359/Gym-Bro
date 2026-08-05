@@ -148,7 +148,7 @@ export default function WorkoutSessionPage() {
                 </div>
                 {expandedPlanId === plan.id && (
                   <ol className="list-decimal space-y-1 border-t bg-[var(--color-surface)] p-4 pl-8 text-sm border-[var(--color-border)]">
-                    {plan.instructions.map((step, i) => <li key={i}>{step}</li>)}
+                    {plan.instructions.map((step: string, i: number) => <li key={i}>{step}</li>)}
                   </ol>
                 )}
               </div>
