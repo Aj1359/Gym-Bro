@@ -1,15 +1,16 @@
 package com.example.demo.dashboard;
 
 import com.example.demo.dashboard.dto.DashboardResponse;
-import com.example.demo.user.User;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.UUID;
+
 @RestController
-@RequestMapping("/api/dashboard")
+@RequestMapping("/dashboard")
 public class DashboardController {
 
     private final DashboardService dashboardService;
@@ -19,7 +20,8 @@ public class DashboardController {
     }
 
     @GetMapping
-    public ResponseEntity<DashboardResponse> getDashboard(@AuthenticationPrincipal User user) {
-        return ResponseEntity.ok(dashboardService.getDashboard(user.getId()));
+    public ResponseEntity<DashboardResponse> getDashboard(Authentication authentication) {
+        UUID userId = (UUID) authentication.getPrincipal();
+        return ResponseEntity.ok(dashboardService.getDashboard(userId));
     }
 }

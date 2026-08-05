@@ -9,7 +9,6 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import com.example.demo.user.User;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -34,43 +33,44 @@ public class NutritionController {
     }
 
     @PostMapping("/meals")
-    public ResponseEntity<MealResponse> logMeal(@AuthenticationPrincipal User user,
+    public ResponseEntity<MealResponse> logMeal(@AuthenticationPrincipal UUID userId,
                                                    @Valid @RequestBody LogMealRequest request) {
-        return ResponseEntity.ok(nutritionService.logMeal(user.getId(), request));
+        return ResponseEntity.ok(nutritionService.logMeal(userId, request));
     }
 
     @GetMapping("/meals")
     public ResponseEntity<DailyNutritionSummary> getDailySummary(
-            @AuthenticationPrincipal User user,
+            @AuthenticationPrincipal UUID userId,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
-        return ResponseEntity.ok(nutritionService.getDailySummary(user.getId(), date));
+        return ResponseEntity.ok(nutritionService.getDailySummary(userId, date));
     }
 
     @DeleteMapping("/meals/{mealId}")
-    public ResponseEntity<Void> deleteMeal(@AuthenticationPrincipal User user, @PathVariable UUID mealId) {
-        nutritionService.deleteMeal(user.getId(), mealId);
+    public ResponseEntity<Void> deleteMeal(@AuthenticationPrincipal UUID userId, @PathVariable UUID mealId) {
+        nutritionService.deleteMeal(userId, mealId);
         return ResponseEntity.noContent().build();
     }
 
     @PutMapping("/foods/{foodId}/favorite")
-    public ResponseEntity<Void> toggleFavorite(@AuthenticationPrincipal User user, @PathVariable UUID foodId) {
-        nutritionService.toggleFavorite(user.getId(), foodId);
+    public ResponseEntity<Void> toggleFavorite(@AuthenticationPrincipal UUID userId, @PathVariable UUID foodId) {
+        nutritionService.toggleFavorite(userId, foodId);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/foods/favorites")
-    public ResponseEntity<List<FoodResponse>> getFavorites(@AuthenticationPrincipal User user) {
-        return ResponseEntity.ok(nutritionService.getFavorites(user.getId()));
+    public ResponseEntity<List<FoodResponse>> getFavorites(@AuthenticationPrincipal UUID userId) {
+        return ResponseEntity.ok(nutritionService.getFavorites(userId));
     }
 
     @GetMapping("/foods/recent")
-    public ResponseEntity<List<FoodResponse>> getRecent(@AuthenticationPrincipal User user) {
-        return ResponseEntity.ok(nutritionService.getRecentFoods(user.getId()));
+    public ResponseEntity<List<FoodResponse>> getRecent(@AuthenticationPrincipal UUID userId) {
+        return ResponseEntity.ok(nutritionService.getRecentFoods(userId));
     }
 
     @PostMapping("/water")
-    public ResponseEntity<WaterSummaryResponse> logWater(@AuthenticationPrincipal User user,
+    public ResponseEntity<WaterSummaryResponse> logWater(@AuthenticationPrincipal UUID userId,
                                                             @Valid @RequestBody LogWaterRequest request) {
-        return ResponseEntity.ok(nutritionService.logWater(user.getId(), request));
+        return ResponseEntity.ok(nutritionService.logWater(userId, request));
     }
 }
+
