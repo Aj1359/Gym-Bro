@@ -9,7 +9,9 @@ import ManageSplitsPage from './pages/ManageSplitsPage';
 import WorkoutHistoryPage from './pages/WorkoutHistoryPage';
 import NutritionPage from './pages/NutritionPage';
 import DashboardPage from './pages/DashboardPage';
+import ProgressPage from './pages/ProgressPage';
 import ProtectedRoute from './routes/ProtectedRoute';
+import AppLayout from './components/AppLayout';
 
 export default function App() {
   return (
@@ -20,13 +22,16 @@ export default function App() {
         <Route path="/register" element={<RegisterPage />} />
 
         <Route element={<ProtectedRoute />}>
-          <Route path="/dashboard" element={<DashboardPage />} />
-          <Route path="/profile" element={<ProfilePage />} />
-          <Route path="/exercises" element={<ExerciseLibraryPage />} />
-          <Route path="/splits" element={<ManageSplitsPage />} />
-          <Route path="/history" element={<WorkoutHistoryPage />} />
-          <Route path="/workout" element={<WorkoutSessionPage />} />
-          <Route path="/nutrition" element={<NutritionPage />} />
+          <Route element={<AppLayout />}>
+            <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/exercises" element={<ExerciseLibraryPage />} />
+            <Route path="/splits" element={<ManageSplitsPage />} />
+            <Route path="/history" element={<WorkoutHistoryPage />} />
+            <Route path="/workout" element={<WorkoutSessionPage />} />
+            <Route path="/nutrition" element={<NutritionPage />} />
+            <Route path="/progress" element={<ProgressPage />} />
+          </Route>
         </Route>
       </Routes>
     </BrowserRouter>

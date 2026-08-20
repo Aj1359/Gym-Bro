@@ -7,4 +7,5 @@ import java.util.UUID;
 
 public interface MealRepository extends JpaRepository<Meal, UUID> {
     List<Meal> findByUserIdAndLoggedAtBetweenOrderByLoggedAtAsc(UUID userId, LocalDateTime start, LocalDateTime end);
+    List<Meal> findTop4ByUserIdOrderByLoggedAtDesc(UUID userId);
 }

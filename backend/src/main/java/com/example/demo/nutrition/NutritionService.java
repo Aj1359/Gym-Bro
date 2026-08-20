@@ -122,6 +122,10 @@ public class NutritionService {
         return new WaterSummaryResponse(total);
     }
 
+    public MealResponse toMealResponsePublic(Meal meal, Food food) {
+        return toMealResponse(meal, food);
+    }
+
     private FoodResponse toFoodResponse(Food f) {
         return new FoodResponse(f.getId(), f.getName(), f.getCategory(), f.getServingSize(), f.getServingUnit(),
                 f.getCalories(), f.getProteinG(), f.getCarbsG(), f.getFatG(), f.getFiberG());

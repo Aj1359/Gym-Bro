@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { getExercises, type Exercise } from '../features/exercises/exerciseApi';
-import ThemeToggle from '../components/ThemeToggle';
+
 
 const MUSCLE_OPTIONS = ['chest', 'back', 'shoulders', 'biceps', 'triceps', 'legs', 'abdominals'];
 const EQUIPMENT_OPTIONS = ['barbell', 'dumbbell', 'cable', 'machine', 'body only'];
@@ -41,9 +41,6 @@ export default function ExerciseLibraryPage() {
 
   return (
     <div className="mx-auto max-w-5xl p-8">
-      <div className="flex justify-end p-4">
-        <ThemeToggle />
-      </div>
       <h1 className="mb-6 text-2xl font-bold">Exercise Library</h1>
 
       <div className="mb-6 grid grid-cols-4 gap-4">
