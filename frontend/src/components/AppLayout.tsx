@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { NavLink, Outlet, useNavigate, NavLink as NL } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import ThemeToggle from './ThemeToggle';
+import NotificationBell from './NotificationBell';
 import { clearCredentials } from '../features/auth/authSlice';
 import type { AppDispatch, RootState } from '../app/store';
 
@@ -90,9 +91,13 @@ export default function AppLayout() {
         {/* ── Sidebar footer: Profile + ThemeToggle + Logout ── */}
         <div className="border-t border-[var(--color-border)] p-3 space-y-2">
           {/* Theme toggle row */}
+          {/* Theme toggle & Notifications row */}
           <div className="flex items-center justify-between rounded-xl px-3 py-2 bg-[var(--color-surface)]">
-            <span className="text-xs text-[var(--color-text-muted)] font-medium">Theme</span>
-            <ThemeToggle />
+            <span className="text-xs text-[var(--color-text-muted)] font-medium">Theme & Alerts</span>
+            <div className="flex items-center gap-3">
+              <NotificationBell />
+              <ThemeToggle />
+            </div>
           </div>
 
           {/* Profile link */}

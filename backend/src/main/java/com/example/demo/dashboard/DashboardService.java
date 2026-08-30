@@ -13,6 +13,7 @@ import com.example.demo.profile.ProfileService;
 import com.example.demo.profile.dto.ProfileResponse;
 import com.example.demo.workout.Workout;
 import com.example.demo.workout.WorkoutRepository;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -60,7 +61,12 @@ public class DashboardService {
 
         List<Integer> weeklyScores = new ArrayList<>();
         for (int i = 6; i >= 0; i--) {
-            weeklyScores.add(computeDailyScore(userId, today.minusDays(i), targets));
+            LocalDate day = today.minusDays(i);
+            if (day.isEqual(today)) {
+                weeklyScores.add(computeDailyScoreUncached(userId, day, targets)); // always fresh for today
+            } else {
+                weeklyScores.add(computeDailyScore(userId, day, targets)); // cached, safe — day is finalized
+            }
         }
         int weeklyConsistency = (int) weeklyScores.stream().filter(s -> s > 0).count();
         int dailyScore = weeklyScores.get(weeklyScores.size() - 1); // today = last entry
@@ -125,7 +131,13 @@ public class DashboardService {
      * Daily Score (0-100): weighted blend of workout completion, calorie adherence,
      * protein adherence, and water adherence. Gracefully reweights if targets are unavailable.
      */
-    private int computeDailyScore(UUID userId, LocalDate date, GoalTargets targets) {
+    @Cacheable(value = "dashboardScore", key = "#userId + ':' + #date")
+    public int computeDailyScore(UUID userId, LocalDate date, GoalTargets targets) {
+        System.out.println("CACHE MISS — computing daily score for " + date);
+        return computeDailyScoreUncached(userId, date, targets);
+    }
+
+    public int computeDailyScoreUncached(UUID userId, LocalDate date, GoalTargets targets) {
         LocalDateTime start = date.atStartOfDay();
         LocalDateTime end = date.plusDays(1).atStartOfDay();
 

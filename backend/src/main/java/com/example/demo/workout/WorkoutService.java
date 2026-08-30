@@ -1,6 +1,10 @@
 package com.example.demo.workout;
 
 import com.example.demo.workout.dto.*;
+import com.example.demo.notification.WorkoutEventProducer;
+import com.example.demo.notification.event.WorkoutCompletedEvent;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,12 +19,14 @@ public class WorkoutService {
     private final WorkoutSetRepository workoutSetRepository;
     private final TemplateService templateService;
     private final WorkoutStatsService statsService;
+    private final WorkoutEventProducer eventProducer;
 
-    public WorkoutService(WorkoutRepository workoutRepository, WorkoutSetRepository workoutSetRepository, TemplateService templateService, WorkoutStatsService statsService) {
+    public WorkoutService(WorkoutRepository workoutRepository, WorkoutSetRepository workoutSetRepository, TemplateService templateService, WorkoutStatsService statsService, WorkoutEventProducer eventProducer) {
         this.workoutRepository = workoutRepository;
         this.workoutSetRepository = workoutSetRepository;
         this.templateService = templateService;
         this.statsService = statsService;
+        this.eventProducer = eventProducer;
     }
 
     @Transactional
@@ -43,6 +49,7 @@ public class WorkoutService {
     }
 
     @Transactional
+    @CacheEvict(value = "exerciseHistory", key = "#userId + ':' + #request.exerciseId()")
     public WorkoutResponse logSet(UUID userId, UUID workoutId, LogSetRequest request) {
         Workout workout = findOwnedWorkout(userId, workoutId);
 
@@ -64,7 +71,21 @@ public class WorkoutService {
         Workout workout = findOwnedWorkout(userId, workoutId);
         workout.complete();
         workout = workoutRepository.save(workout);
-        return toResponse(userId, workout);
+
+        WorkoutResponse response = toResponse(userId, workout);
+        
+        int prCount = (int) response.sets().stream().filter(WorkoutSetResponse::isPersonalRecord).count();
+        eventProducer.publishWorkoutCompleted(new WorkoutCompletedEvent(
+                workout.getId(), userId, workout.getTitle(), response.totalVolume(), prCount, workout.getCompletedAt()
+        ));
+
+        return response;
+    }
+
+    @Cacheable(value = "exerciseHistory", key = "#userId + ':' + #exerciseId")
+    public List<WorkoutSet> getExerciseHistory(UUID userId, UUID exerciseId) {
+        System.out.println("CACHE MISS — fetching exercise history for " + exerciseId);
+        return workoutSetRepository.findHistoryForExercise(userId, exerciseId);
     }
 
     private Workout findOwnedWorkout(UUID userId, UUID workoutId) {
@@ -83,7 +104,7 @@ public class WorkoutService {
         List<WorkoutSetResponse> sets = rawSets.stream().map(s -> {
             java.math.BigDecimal oneRepMax = statsService.estimatedOneRepMax(s.getWeightKg(), s.getReps());
 
-            List<WorkoutSet> priorSets = workoutSetRepository.findHistoryForExercise(userId, s.getExerciseId())
+            List<WorkoutSet> priorSets = getExerciseHistory(userId, s.getExerciseId())
                     .stream()
                     .filter(prior -> prior.getCreatedAt().isBefore(s.getCreatedAt()))
                     .collect(Collectors.toList());

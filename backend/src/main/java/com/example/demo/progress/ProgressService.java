@@ -10,6 +10,7 @@ import com.example.demo.workout.WorkoutRepository;
 import com.example.demo.workout.WorkoutSet;
 import com.example.demo.workout.WorkoutSetRepository;
 import com.example.demo.workout.WorkoutStatsService;
+import com.example.demo.workout.WorkoutService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,16 +30,18 @@ public class ProgressService {
     private final MealRepository mealRepository;
     private final FoodRepository foodRepository;
     private final WorkoutStatsService statsService;
+    private final WorkoutService workoutService;
 
     public ProgressService(BodyMeasurementRepository measurementRepository, WorkoutRepository workoutRepository,
                             WorkoutSetRepository workoutSetRepository, MealRepository mealRepository,
-                            FoodRepository foodRepository, WorkoutStatsService statsService) {
+                            FoodRepository foodRepository, WorkoutStatsService statsService, WorkoutService workoutService) {
         this.measurementRepository = measurementRepository;
         this.workoutRepository = workoutRepository;
         this.workoutSetRepository = workoutSetRepository;
         this.mealRepository = mealRepository;
         this.foodRepository = foodRepository;
         this.statsService = statsService;
+        this.workoutService = workoutService;
     }
 
     @Transactional
@@ -76,7 +79,7 @@ public class ProgressService {
     }
 
     public List<DataPoint> getStrengthTrend(UUID userId, UUID exerciseId) {
-        return workoutSetRepository.findHistoryForExercise(userId, exerciseId)
+        return workoutService.getExerciseHistory(userId, exerciseId)
                 .stream()
                 .map(s -> new DataPoint(
                         s.getCreatedAt().toLocalDate(),
