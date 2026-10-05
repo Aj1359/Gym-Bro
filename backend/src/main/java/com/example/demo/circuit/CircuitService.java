@@ -15,16 +15,19 @@ public class CircuitService {
     private final CircuitSessionRepository sessionRepository;
     private final CircuitStationRepository stationRepository;
     private final CircuitAiReportRepository aiReportRepository;
-    private final CircuitEventProducer eventProducer;
+    private final com.example.demo.common.outbox.OutboxEventRepository outboxRepository;
+    private final com.fasterxml.jackson.databind.ObjectMapper objectMapper;
 
     public CircuitService(CircuitSessionRepository sessionRepository,
                           CircuitStationRepository stationRepository,
                           CircuitAiReportRepository aiReportRepository,
-                          CircuitEventProducer eventProducer) {
+                          com.example.demo.common.outbox.OutboxEventRepository outboxRepository,
+                          com.fasterxml.jackson.databind.ObjectMapper objectMapper) {
         this.sessionRepository = sessionRepository;
         this.stationRepository = stationRepository;
         this.aiReportRepository = aiReportRepository;
-        this.eventProducer = eventProducer;
+        this.outboxRepository = outboxRepository;
+        this.objectMapper = objectMapper;
     }
 
     @Transactional
@@ -104,14 +107,23 @@ public class CircuitService {
                 ))
                 .collect(Collectors.toList());
 
-        eventProducer.publishCircuitCompleted(new CircuitCompletedEvent(
+        CircuitCompletedEvent eventPayload = new CircuitCompletedEvent(
                 session.getId(),
                 userId,
                 session.getTitle(),
                 session.getOverallNotes(),
                 snapshots,
                 session.getCompletedAt()
-        ));
+        );
+
+        try {
+            String payloadJson = objectMapper.writeValueAsString(eventPayload);
+            outboxRepository.save(new com.example.demo.common.outbox.OutboxEvent(
+                    "Circuit", session.getId(), "CircuitCompletedEvent", payloadJson
+            ));
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to serialize Outbox event for circuit", e);
+        }
 
         return toResponse(session, stations, report);
     }
