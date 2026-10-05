@@ -1,5 +1,5 @@
 CREATE TABLE workouts (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    id UUID DEFAULT random_uuid() PRIMARY KEY,
     user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     title VARCHAR(100) NOT NULL,
     started_at TIMESTAMP NOT NULL DEFAULT now(),
@@ -7,7 +7,7 @@ CREATE TABLE workouts (
 );
 
 CREATE TABLE workout_sets (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    id UUID DEFAULT random_uuid() PRIMARY KEY,
     workout_id UUID NOT NULL REFERENCES workouts(id) ON DELETE CASCADE,
     exercise_id UUID NOT NULL REFERENCES exercises(id),
     set_number INT NOT NULL,

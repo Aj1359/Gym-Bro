@@ -35,4 +35,9 @@ public class AuthController {
         authService.logout(request);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/health")
+    public ResponseEntity<java.util.Map<String, String>> health() {
+        return ResponseEntity.ok(java.util.Map.of("status", "UP"));
+    }
 }

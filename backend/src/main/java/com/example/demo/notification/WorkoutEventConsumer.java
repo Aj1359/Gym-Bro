@@ -1,7 +1,7 @@
 package com.example.demo.notification;
 
 import com.example.demo.notification.event.WorkoutCompletedEvent;
-import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -13,7 +13,7 @@ public class WorkoutEventConsumer {
         this.notificationService = notificationService;
     }
 
-    @KafkaListener(topics = "workout-completed", groupId = "gymbro-backend")
+    @EventListener
     public void handleWorkoutCompleted(WorkoutCompletedEvent event) {
         String title;
         String body;

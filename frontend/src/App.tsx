@@ -10,6 +10,8 @@ import WorkoutHistoryPage from './pages/WorkoutHistoryPage';
 import NutritionPage from './pages/NutritionPage';
 import DashboardPage from './pages/DashboardPage';
 import ProgressPage from './pages/ProgressPage';
+import CircuitBuilderPage from './pages/CircuitBuilderPage';
+import CircuitSessionPage from './pages/CircuitSessionPage';
 import ProtectedRoute from './routes/ProtectedRoute';
 import AppLayout from './components/AppLayout';
 
@@ -29,6 +31,8 @@ export default function App() {
             <Route path="/splits" element={<ManageSplitsPage />} />
             <Route path="/history" element={<WorkoutHistoryPage />} />
             <Route path="/workout" element={<WorkoutSessionPage />} />
+            <Route path="/circuits/new" element={<CircuitBuilderPage />} />
+            <Route path="/circuits/:id" element={<CircuitSessionPage />} />
             <Route path="/nutrition" element={<NutritionPage />} />
             <Route path="/progress" element={<ProgressPage />} />
           </Route>

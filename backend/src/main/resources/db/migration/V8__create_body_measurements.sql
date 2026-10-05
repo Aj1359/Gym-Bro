@@ -1,5 +1,5 @@
 CREATE TABLE body_measurements (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    id UUID DEFAULT random_uuid() PRIMARY KEY,
     user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     weight_kg NUMERIC(5,2),
     body_fat_pct NUMERIC(4,1),

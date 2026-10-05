@@ -1,5 +1,5 @@
 CREATE TABLE workout_day_templates (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    id UUID DEFAULT random_uuid() PRIMARY KEY,
     user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     name VARCHAR(50) NOT NULL,
     display_order INT NOT NULL DEFAULT 0,
@@ -7,7 +7,7 @@ CREATE TABLE workout_day_templates (
 );
 
 CREATE TABLE workout_day_exercises (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    id UUID DEFAULT random_uuid() PRIMARY KEY,
     template_id UUID NOT NULL REFERENCES workout_day_templates(id) ON DELETE CASCADE,
     exercise_id UUID NOT NULL REFERENCES exercises(id),
     order_index INT NOT NULL DEFAULT 0,

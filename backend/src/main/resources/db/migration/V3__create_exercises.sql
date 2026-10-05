@@ -1,5 +1,5 @@
 CREATE TABLE exercises (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    id UUID DEFAULT random_uuid() PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     force VARCHAR(30),
     level VARCHAR(30) NOT NULL,

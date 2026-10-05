@@ -1,20 +1,60 @@
 version: '3.8'
+
 services:
+  # ── 1. PostgreSQL Database ──
+  postgres:
+    image: postgres:16-alpine
+    container_name: gymbro-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: gymbro
+      POSTGRES_USER: ${SPRING_DATASOURCE_USERNAME:-postgres}
+      POSTGRES_PASSWORD: ${SPRING_DATASOURCE_PASSWORD:-postgres}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - gymbro-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${SPRING_DATASOURCE_USERNAME:-postgres} -d gymbro"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── 2. Redis Cache ──
   redis:
     image: redis:7-alpine
+    container_name: gymbro-redis
+    restart: unless-stopped
     ports:
       - "6379:6379"
     volumes:
       - redisdata:/data
+    networks:
+      - gymbro-net
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
+  # ── 3. Apache Zookeeper ──
   zookeeper:
     image: confluentinc/cp-zookeeper:7.5.0
+    container_name: gymbro-zookeeper
+    restart: unless-stopped
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
+    networks:
+      - gymbro-net
 
+  # ── 4. Apache Kafka Broker ──
   kafka:
     image: confluentinc/cp-kafka:7.5.0
+    container_name: gymbro-kafka
+    restart: unless-stopped
     depends_on:
       - zookeeper
     ports:
@@ -22,9 +62,61 @@ services:
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092,PLAINTEXT_INTERNAL://kafka:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_INTERNAL:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT_INTERNAL
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    networks:
+      - gymbro-net
+
+  # ── 5. Spring Boot 3 Backend API ──
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: gymbro-backend
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL:-jdbc:postgresql://postgres:5432/gymbro}
+      SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME:-postgres}
+      SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD:-postgres}
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_DATA_REDIS_PORT: 6379
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      JWT_SECRET: ${JWT_SECRET:-9a2f694578e9f1a23c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b}
+      JWT_ACCESS_TOKEN_EXPIRY_MS: ${JWT_ACCESS_TOKEN_EXPIRY_MS:-900000}
+      JWT_REFRESH_TOKEN_EXPIRY_MS: ${JWT_REFRESH_TOKEN_EXPIRY_MS:-604800000}
+    networks:
+      - gymbro-net
+
+  # ── 6. React 19 Frontend Client (Nginx) ──
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: gymbro-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "80:80"
+      - "5173:80"
+    networks:
+      - gymbro-net
 
 volumes:
+  pgdata:
   redisdata:
+
+networks:
+  gymbro-net:
+    driver: bridge

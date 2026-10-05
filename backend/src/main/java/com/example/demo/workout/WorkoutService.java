@@ -19,14 +19,16 @@ public class WorkoutService {
     private final WorkoutSetRepository workoutSetRepository;
     private final TemplateService templateService;
     private final WorkoutStatsService statsService;
-    private final WorkoutEventProducer eventProducer;
+    private final com.example.demo.common.outbox.OutboxEventRepository outboxRepository;
+    private final com.fasterxml.jackson.databind.ObjectMapper objectMapper;
 
-    public WorkoutService(WorkoutRepository workoutRepository, WorkoutSetRepository workoutSetRepository, TemplateService templateService, WorkoutStatsService statsService, WorkoutEventProducer eventProducer) {
+    public WorkoutService(WorkoutRepository workoutRepository, WorkoutSetRepository workoutSetRepository, TemplateService templateService, WorkoutStatsService statsService, com.example.demo.common.outbox.OutboxEventRepository outboxRepository, com.fasterxml.jackson.databind.ObjectMapper objectMapper) {
         this.workoutRepository = workoutRepository;
         this.workoutSetRepository = workoutSetRepository;
         this.templateService = templateService;
         this.statsService = statsService;
-        this.eventProducer = eventProducer;
+        this.outboxRepository = outboxRepository;
+        this.objectMapper = objectMapper;
     }
 
     @Transactional
@@ -75,9 +77,18 @@ public class WorkoutService {
         WorkoutResponse response = toResponse(userId, workout);
         
         int prCount = (int) response.sets().stream().filter(WorkoutSetResponse::isPersonalRecord).count();
-        eventProducer.publishWorkoutCompleted(new WorkoutCompletedEvent(
+        WorkoutCompletedEvent eventPayload = new WorkoutCompletedEvent(
                 workout.getId(), userId, workout.getTitle(), response.totalVolume(), prCount, workout.getCompletedAt()
-        ));
+        );
+
+        try {
+            String payloadJson = objectMapper.writeValueAsString(eventPayload);
+            outboxRepository.save(new com.example.demo.common.outbox.OutboxEvent(
+                    "Workout", workout.getId(), "WorkoutCompletedEvent", payloadJson
+            ));
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to serialize Outbox event", e);
+        }
 
         return response;
     }

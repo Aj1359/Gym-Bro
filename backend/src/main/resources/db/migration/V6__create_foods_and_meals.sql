@@ -1,5 +1,5 @@
 CREATE TABLE foods (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    id UUID DEFAULT random_uuid() PRIMARY KEY,
     name VARCHAR(150) NOT NULL,
     category VARCHAR(50) NOT NULL,
     serving_size NUMERIC(6,1) NOT NULL,
@@ -15,7 +15,7 @@ CREATE INDEX idx_foods_name ON foods USING GIN (to_tsvector('english', name));
 CREATE INDEX idx_foods_category ON foods(category);
 
 CREATE TABLE meals (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    id UUID DEFAULT random_uuid() PRIMARY KEY,
     user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     food_id UUID NOT NULL REFERENCES foods(id),
     meal_type VARCHAR(20) NOT NULL,

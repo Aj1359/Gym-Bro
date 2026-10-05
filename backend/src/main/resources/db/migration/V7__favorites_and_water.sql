@@ -6,7 +6,7 @@ CREATE TABLE favorite_foods (
 );
 
 CREATE TABLE water_logs (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    id UUID DEFAULT random_uuid() PRIMARY KEY,
     user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     amount_ml INT NOT NULL,
     logged_at TIMESTAMP NOT NULL DEFAULT now()

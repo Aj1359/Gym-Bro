@@ -21,6 +21,7 @@ const NAV_ITEMS = [
   { to: '/dashboard', label: 'Dashboard', icon: '🏠' },
   { to: '/progress', label: 'Progress', icon: '📈' },
   { to: '/workout', label: 'Workouts', icon: '🏋️' },
+  { to: '/circuits/new', label: 'AI Circuits', icon: '⚡' },
   { to: '/history', label: 'History', icon: '📜' },
   { to: '/splits', label: 'Splits', icon: '📋' },
   { to: '/exercises', label: 'Exercise Library', icon: '📖' },

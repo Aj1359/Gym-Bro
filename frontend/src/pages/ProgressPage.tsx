@@ -163,8 +163,8 @@ function TrendChart({ data, color, unit, emptyMessage }: {
         <YAxis tick={{ fill: 'var(--color-text-muted)', fontSize: 11 }} domain={['auto', 'auto']} />
         <Tooltip
           contentStyle={{ background: 'var(--color-card)', border: '1px solid var(--color-border)', borderRadius: 8 }}
-          formatter={(value: number) => [`${value}${unit}`, '']}
-          labelFormatter={(d) => new Date(d).toLocaleDateString()}
+          formatter={(value: any) => [`${value}${unit}`, '']}
+          labelFormatter={(d: any) => new Date(d).toLocaleDateString()}
         />
         <Line type="monotone" dataKey="value" stroke={color} strokeWidth={2} dot={{ r: 3 }} />
       </LineChart>
