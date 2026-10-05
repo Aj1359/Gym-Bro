@@ -265,3 +265,6 @@ python scratch/auth_test.py
 
 ## 📜 License
 This project is licensed under the MIT License.
+
+- Added Progressive Overload Engine and Dashboard Readiness features
+
