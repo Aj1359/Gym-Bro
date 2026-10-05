@@ -21,14 +21,16 @@ public class WorkoutService {
     private final WorkoutStatsService statsService;
     private final com.example.demo.common.outbox.OutboxEventRepository outboxRepository;
     private final com.fasterxml.jackson.databind.ObjectMapper objectMapper;
+    private final ProgressiveOverloadEngine overloadEngine;
 
-    public WorkoutService(WorkoutRepository workoutRepository, WorkoutSetRepository workoutSetRepository, TemplateService templateService, WorkoutStatsService statsService, com.example.demo.common.outbox.OutboxEventRepository outboxRepository, com.fasterxml.jackson.databind.ObjectMapper objectMapper) {
+    public WorkoutService(WorkoutRepository workoutRepository, WorkoutSetRepository workoutSetRepository, TemplateService templateService, WorkoutStatsService statsService, com.example.demo.common.outbox.OutboxEventRepository outboxRepository, com.fasterxml.jackson.databind.ObjectMapper objectMapper, ProgressiveOverloadEngine overloadEngine) {
         this.workoutRepository = workoutRepository;
         this.workoutSetRepository = workoutSetRepository;
         this.templateService = templateService;
         this.statsService = statsService;
         this.outboxRepository = outboxRepository;
         this.objectMapper = objectMapper;
+        this.overloadEngine = overloadEngine;
     }
 
     @Transactional
@@ -97,6 +99,11 @@ public class WorkoutService {
     public List<WorkoutSet> getExerciseHistory(UUID userId, UUID exerciseId) {
         System.out.println("CACHE MISS — fetching exercise history for " + exerciseId);
         return workoutSetRepository.findHistoryForExercise(userId, exerciseId);
+    }
+
+    public ProgressiveOverloadEngine.Recommendation getRecommendation(UUID userId, UUID exerciseId, int targetReps) {
+        List<WorkoutSet> history = getExerciseHistory(userId, exerciseId);
+        return overloadEngine.recommendNextSet(history, targetReps);
     }
 
     private Workout findOwnedWorkout(UUID userId, UUID workoutId) {
