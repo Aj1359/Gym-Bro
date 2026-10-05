@@ -24,4 +24,10 @@ public class DashboardController {
         UUID userId = (UUID) authentication.getPrincipal();
         return ResponseEntity.ok(dashboardService.getDashboard(userId));
     }
+
+    @GetMapping("/readiness")
+    public ResponseEntity<com.example.demo.dashboard.dto.ReadinessResponse> getReadiness(Authentication authentication) {
+        UUID userId = (UUID) authentication.getPrincipal();
+        return ResponseEntity.ok(dashboardService.getReadiness(userId));
+    }
 }
