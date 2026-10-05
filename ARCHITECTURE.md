@@ -135,26 +135,26 @@ Features like Notifications, Achievements, Analytics, and AI Recommendations do 
 
 ## 5. Development Roadmap
 
-### Phase 1 — Fix the foundation
+### Phase 1 — Fix the foundation (COMPLETED)
 1. Authentication & Authorization
 2. DTO validation & Exception handling
 3. Transaction boundaries
 4. DB constraints & indexes
 5. Clean up architecture (remove MVC/WebFlux mix if any)
 
-### Phase 2 — Correct infrastructure
+### Phase 2 — Correct infrastructure (COMPLETED)
 6. Redis caching & rate limiting strategy
 7. Kafka topic design & Consumer retries
 8. Idempotent consumers & Dead-letter queues
 9. The Outbox pattern implementation
 
-### Phase 3 — Product
+### Phase 3 — Product (IN PROGRESS)
 10. Onboarding flow
 11. Advanced Dashboard
 12. Workout Engine (Progressive overload, Readiness score)
 13. Achievements
 
-### Phase 4 — Intelligence
+### Phase 4 — Intelligence (IN PROGRESS)
 14. Recommendation Engine (Coach Mode)
 15. Personal Fitness Twin
 16. Behavioral consistency analysis
