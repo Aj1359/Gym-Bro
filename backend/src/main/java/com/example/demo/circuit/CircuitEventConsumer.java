@@ -6,9 +6,13 @@ import com.example.demo.circuit.event.CircuitCompletedEvent;
 import com.example.demo.notification.NotificationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.example.demo.common.idempotency.ProcessedEvent;
+import com.example.demo.common.idempotency.ProcessedEventRepository;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.UUID;
 
 @Component
 public class CircuitEventConsumer {
@@ -18,18 +22,28 @@ public class CircuitEventConsumer {
     private final AiScoringClient aiScoringClient;
     private final CircuitAiReportRepository aiReportRepository;
     private final NotificationService notificationService;
+    private final ProcessedEventRepository processedEventRepository;
 
     public CircuitEventConsumer(AiScoringClient aiScoringClient,
                                 CircuitAiReportRepository aiReportRepository,
-                                NotificationService notificationService) {
+                                NotificationService notificationService,
+                                ProcessedEventRepository processedEventRepository) {
         this.aiScoringClient = aiScoringClient;
         this.aiReportRepository = aiReportRepository;
         this.notificationService = notificationService;
+        this.processedEventRepository = processedEventRepository;
     }
 
     @EventListener
     @Transactional
     public void handleCircuitCompleted(CircuitCompletedEvent event) {
+        UUID eventId = event.sessionId(); // Using sessionId as idempotency key
+        
+        if (processedEventRepository.existsByEventIdAndConsumerName(eventId, "CircuitEventConsumer")) {
+            log.info("Ignoring duplicate circuit-completed event for session {}", eventId);
+            return;
+        }
+
         log.info("Received circuit-completed event for session {} (user {})", event.sessionId(), event.userId());
 
         String prompt = buildPrompt(event);
@@ -50,6 +64,9 @@ public class CircuitEventConsumer {
                 event.title(), result.overallScore(), result.planQualityScore(), result.adherenceScore());
 
         notificationService.createNotification(event.userId(), notifTitle, notifBody, "circuit_scored");
+        
+        processedEventRepository.save(new ProcessedEvent(eventId, "CircuitEventConsumer"));
+        
         log.info("Successfully generated and saved AI score for circuit {}", event.sessionId());
     }
 
