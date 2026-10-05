@@ -196,4 +196,47 @@ public class DashboardService {
         }
         return streak;
     }
+
+    public ReadinessResponse getReadiness(UUID userId) {
+        LocalDate today = LocalDate.now();
+        LocalDate yesterday = today.minusDays(1);
+        
+        // 1. Fatigue from recent workouts
+        LocalDateTime twoDaysAgo = today.minusDays(2).atStartOfDay();
+        List<Workout> recentWorkouts = workoutRepository.findByUserIdAndStartedAtBetween(userId, twoDaysAgo, today.plusDays(1).atStartOfDay());
+        double fatiguePenalty = recentWorkouts.size() * 15.0; // Simple heuristic: 15 points penalty per workout in last 48h
+        
+        // 2. Nutrition adherence from yesterday
+        double nutritionBonus = 0;
+        try {
+            ProfileResponse profile = profileService.getProfile(userId);
+            if (profile.targets() != null) {
+                int yesterdayScore = computeDailyScore(userId, yesterday, profile.targets());
+                // If yesterday's score was high, you recovered well.
+                nutritionBonus = (yesterdayScore - 50) * 0.4; // Max +20 bonus for perfect nutrition, penalty for bad.
+            }
+        } catch (Exception e) {
+            // Ignored
+        }
+
+        // Base readiness is 80 (assuming baseline healthy).
+        int score = (int) Math.round(80 - fatiguePenalty + nutritionBonus);
+        score = Math.max(0, Math.min(100, score));
+
+        String status;
+        String recommendation;
+        
+        if (score >= 80) {
+            status = "Prime";
+            recommendation = "You are fully recovered and ready to push hard today. Go for personal records!";
+        } else if (score >= 50) {
+            status = "Recovering";
+            recommendation = "You are moderately fatigued. A standard workout is fine, but listen to your body.";
+        } else {
+            status = "Fatigued";
+            recommendation = "Your body needs rest. Consider an active recovery day, light cardio, or full rest.";
+        }
+        
+        return new ReadinessResponse(score, status, recommendation);
+    }
 }
