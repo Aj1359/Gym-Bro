@@ -48,4 +48,12 @@ public class WorkoutController {
                                                               @PathVariable UUID workoutId) {
         return ResponseEntity.ok(workoutService.completeWorkout(userId, workoutId));
     }
+
+    @GetMapping("/recommend")
+    public ResponseEntity<ProgressiveOverloadEngine.Recommendation> getRecommendation(
+            @AuthenticationPrincipal UUID userId,
+            @RequestParam UUID exerciseId,
+            @RequestParam(defaultValue = "10") int targetReps) {
+        return ResponseEntity.ok(workoutService.getRecommendation(userId, exerciseId, targetReps));
+    }
 }
